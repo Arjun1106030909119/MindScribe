@@ -1,0 +1,5 @@
+{
+  "name": "MindScribe",
+  "description": "A secure, daily journaling application featuring local encryption, mood tracking, and AI-powered reflections to help you understand your thoughts better.",
+  "requestFramePermissions": []
+}
