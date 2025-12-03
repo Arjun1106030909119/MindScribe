@@ -4,10 +4,11 @@ import { getCurrentUser, getEntries, logout, saveEntry, deleteEntry } from './se
 import { Auth } from './components/Auth';
 import { JournalList } from './components/JournalList';
 import { JournalEditor } from './components/JournalEditor';
-import { LogOut, BookHeart, AlertCircle, RefreshCw } from 'lucide-react';
+import { JournalCalendar } from './components/JournalCalendar';
+import { LogOut, BookHeart, AlertCircle, RefreshCw, Calendar, List } from 'lucide-react';
 import { Button } from './components/Button';
 
-type View = 'auth' | 'list' | 'editor';
+type View = 'auth' | 'list' | 'editor' | 'calendar';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -135,10 +136,15 @@ function App() {
                         }}
                         className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${view === 'list' ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:bg-slate-50'}`}
                     >
+                        <List className="h-4 w-4 mr-3" />
                         All Entries
                     </button>
-                    <button className="w-full flex items-center px-3 py-2 text-sm font-medium text-slate-400 cursor-not-allowed rounded-md hover:bg-slate-50">
-                        Calendar View (Soon)
+                    <button 
+                        onClick={() => setView('calendar')}
+                        className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${view === 'calendar' ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:bg-slate-50'}`}
+                    >
+                        <Calendar className="h-4 w-4 mr-3" />
+                        Calendar View
                     </button>
                 </nav>
             </div>
@@ -159,7 +165,7 @@ function App() {
       <main className="flex-1 h-full overflow-hidden relative">
         {view === 'auth' && <Auth onLogin={handleLogin} />}
         
-        {view === 'list' && user && (
+        {view !== 'auth' && user && (
             <div className="h-full flex flex-col">
                 {/* Mobile Header */}
                 <div className="md:hidden flex items-center justify-between p-4 bg-white border-b border-slate-200">
@@ -167,9 +173,18 @@ function App() {
                         <BookHeart className="h-6 w-6 text-primary-600" />
                         <span className="font-serif font-bold text-lg">MindScribe</span>
                     </div>
-                    <button onClick={handleLogout} className="text-slate-500">
-                        <LogOut className="h-5 w-5" />
-                    </button>
+                    
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => setView(view === 'calendar' ? 'list' : 'calendar')}
+                        className="p-2 text-slate-600 hover:bg-slate-100 rounded-full"
+                      >
+                         {view === 'calendar' ? <List className="h-5 w-5" /> : <Calendar className="h-5 w-5" />}
+                      </button>
+                      <button onClick={handleLogout} className="p-2 text-slate-500 hover:text-red-600">
+                          <LogOut className="h-5 w-5" />
+                      </button>
+                    </div>
                 </div>
 
                 {/* Error Banner */}
@@ -190,24 +205,35 @@ function App() {
                   </div>
                 )}
 
-                <div className="flex-1 overflow-hidden">
-                    <JournalList 
-                        entries={entries} 
-                        onSelectEntry={handleSelectEntry} 
-                        onNewEntry={handleNewEntry} 
-                    />
+                <div className="flex-1 overflow-hidden relative">
+                    {view === 'list' && (
+                       <JournalList 
+                           entries={entries} 
+                           onSelectEntry={handleSelectEntry} 
+                           onNewEntry={handleNewEntry} 
+                       />
+                    )}
+
+                    {view === 'calendar' && (
+                        <JournalCalendar
+                           entries={entries}
+                           onSelectEntry={handleSelectEntry}
+                        />
+                    )}
+
+                    {view === 'editor' && (
+                        <div className="absolute inset-0 bg-white z-10">
+                            <JournalEditor 
+                                entry={selectedEntry}
+                                userId={user.id}
+                                onSave={handleSaveEntry}
+                                onDelete={handleDeleteEntry}
+                                onBack={() => setView('list')}
+                            />
+                        </div>
+                    )}
                 </div>
             </div>
-        )}
-
-        {view === 'editor' && user && (
-            <JournalEditor 
-                entry={selectedEntry}
-                userId={user.id}
-                onSave={handleSaveEntry}
-                onDelete={handleDeleteEntry}
-                onBack={() => setView('list')}
-            />
         )}
       </main>
     </div>
