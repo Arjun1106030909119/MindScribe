@@ -167,7 +167,7 @@ function App() {
                         <BookHeart className="h-6 w-6 text-primary-600" />
                         <span className="font-serif font-bold text-lg">MindScribe</span>
                     </div>
-                    <button onClick={handleLogout} className="text-slate-500" title="Sign out" aria-label="Sign out">
+                    <button onClick={handleLogout} className="text-slate-500">
                         <LogOut className="h-5 w-5" />
                     </button>
                 </div>
